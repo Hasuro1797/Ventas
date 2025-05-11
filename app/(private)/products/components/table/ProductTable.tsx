@@ -1,4 +1,5 @@
 "use client";
+import { deleteProductsAction } from "@/actions/product-actions";
 import SearchDebounce from "@/components/searchDebounce/SearchDebounce";
 import { TitleSection } from "@/components/titleSection";
 import {
@@ -19,6 +20,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { Skeleton } from "@/components/ui/skeleton";
 import {
   Table,
   TableBody,
@@ -27,7 +29,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { useClientsTable } from "@/hooks/useClientTable";
+import { useProductsTable } from "@/hooks/useProductTable";
 import {
   flexRender,
   getCoreRowModel,
@@ -45,11 +47,9 @@ import {
 import { useRouter, useSearchParams } from "next/navigation";
 import { Fragment, useState } from "react";
 import { toast } from "sonner";
-import CreateClientFormComponent from "../CreateClientFormComponent";
-import { clientColumns } from "./clientColumn";
-import ReservationViewsColumn from "./ClientViewsColumn";
-import { Skeleton } from "@/components/ui/skeleton";
-import { deleteClientsAction } from "@/actions/client-actions";
+import CreateProductFormComponent from "../CreateProductFormComponent";
+import { productColumns } from "./productColumn";
+import ProductViewsColumn from "./ProductViewsColumn";
 
 interface CustomTableProps {
   page: number;
@@ -58,18 +58,20 @@ interface CustomTableProps {
   search: string;
 }
 
-export default function ReservationTable({
+export default function ProductTable({
   pageSize,
   page,
   sort,
   search,
 }: CustomTableProps) {
-  const { clients, totalPages, refecthData, loading, total } = useClientsTable({
-    page,
-    pageSize,
-    search,
-    sort,
-  });
+  const { clients, totalPages, refecthData, loading, total } = useProductsTable(
+    {
+      page,
+      pageSize,
+      search,
+      sort,
+    }
+  );
   const [isAlertDialogOpen, setIsAlertDialogOpen] = useState(false);
   const searchParams = useSearchParams();
   const router = useRouter();
@@ -92,7 +94,7 @@ export default function ReservationTable({
     data: clients || [],
     manualPagination: true,
     manualSorting: true,
-    columns: clientColumns(handleSort, refecthData),
+    columns: productColumns(handleSort, refecthData),
     pageCount: totalPages,
     getCoreRowModel: getCoreRowModel(),
   });
@@ -122,13 +124,13 @@ export default function ReservationTable({
     router.replace(`${window.location.pathname}?${params.toString()}`);
   };
 
-  //DELETESELECTEDINVITEES
-  const deleteSelectedAgreement = async () => {
+  //DELETESELETEDPRODUCTS
+  const deleteSelectedProducts = async () => {
     setDeleteLoading(true);
     const ids = table.getSelectedRowModel().rows.map((row) => row.original.id);
-    const response = await deleteClientsAction(ids);
+    const response = await deleteProductsAction(ids);
     if (response.error) {
-      toast.error("Error al eliminar los clientes seleccionadas", {
+      toast.error("Error al eliminar los productos seleccionadas", {
         description: response.error,
         classNames: {
           toast: "bg-background",
@@ -144,8 +146,8 @@ export default function ReservationTable({
     setDeleteLoading(false);
     setIsAlertDialogOpen(false);
     table.resetRowSelection();
-    toast.success(response.message || "Clientes selecccionados eliminados", {
-      description: "Se ha eliminado la lista de clientes correctamente",
+    toast.success(response.message || "Productos selecccionadas eliminadas", {
+      description: "Se ha eliminado la lista de productos correctamente",
       position: "top-center",
       classNames: {
         toast: "bg-background",
@@ -157,7 +159,7 @@ export default function ReservationTable({
 
     await refecthData();
   };
-  const refetchClients = async () => {
+  const refetchProducts = async () => {
     await refecthData();
   };
   // useEffect(() => {
@@ -168,7 +170,7 @@ export default function ReservationTable({
     <div className="w-full">
       <div className="w-full flex justify-between items-center gap-4 item-center">
         <div>
-          <TitleSection title="Clientes" styles="" />
+          <TitleSection title="Productos" styles="" />
           {loading ? (
             <Skeleton className="w-24 h-6" />
           ) : (
@@ -178,7 +180,7 @@ export default function ReservationTable({
           )}
         </div>
         <div className="flex gap-2">
-          <CreateClientFormComponent refetchData={refetchClients} />
+          <CreateProductFormComponent refetchData={refetchProducts} />
         </div>
       </div>
       <div className="flex items-center gap-5 pt-4 pb-3 mt-5">
@@ -207,7 +209,7 @@ export default function ReservationTable({
             />
           </div>
         </div>
-        <ReservationViewsColumn table={table} />
+        <ProductViewsColumn table={table} />
       </div>
       {table && table.getSelectedRowModel().rows.length > 0 && (
         <div className="flex gap-3 items-center pt-2 pb-4">
@@ -249,7 +251,7 @@ export default function ReservationTable({
                 </AlertDialogCancel>
                 <Button
                   variant="destructive"
-                  onClick={deleteSelectedAgreement}
+                  onClick={deleteSelectedProducts}
                   disabled={deleteLoading}
                 >
                   {deleteLoading && (
@@ -290,7 +292,7 @@ export default function ReservationTable({
             {loading ? (
               <TableRow>
                 <TableCell
-                  colSpan={clientColumns(handleSort, refecthData).length}
+                  colSpan={productColumns(handleSort, refecthData).length}
                   className="h-60"
                 >
                   <p className="text-center flex justify-center">
@@ -323,7 +325,7 @@ export default function ReservationTable({
                 ) : (
                   <TableRow>
                     <TableCell
-                      colSpan={clientColumns(handleSort, refecthData).length}
+                      colSpan={productColumns(handleSort, refecthData).length}
                       className="text-center h-24 !col-span-7"
                     >
                       No hay datos

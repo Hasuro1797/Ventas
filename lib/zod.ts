@@ -9,6 +9,8 @@ export const loginFormSchema = object({
 
 export type LoginFormSchema = z.infer<typeof loginFormSchema>;
 
+
+//client
 export const commentSchema = object({
   text: z.string().min(1, { message: "El comentario es requerido" }),
   date: z.date(),
@@ -40,7 +42,6 @@ export const serverClientInfoSchema = z.object({
   preferences: preferenceSchema.optional(),
 });
 
-// AGREGAR id_client: z.number().int().positive("El id_cliente es requerido"), EN OTRO SCHEMA
 export const clientInfoSchema = clientInfoFormSchema.merge(object({
   id_client: z.number().int().positive({ message: "El id_cliente es requerido" }),
 }));
@@ -126,3 +127,20 @@ export const updatedServerSchema = z.object({
 });
 
 export type UpdateClientSchema = z.infer<typeof updateClientSchema>;
+
+//product
+export const productFormSchema = object({
+  name: z.string().min(1, { message: "El nombre es requerido" }),
+  price: z.number().positive({ message: "El precio es requerido" }),
+  stock: z.number().int().positive({ message: "El stock es requerido" }),
+});
+
+export const productSchema = productFormSchema.merge(
+  object({
+    id: z.number().int().positive({ message: "El ID del producto es requerido" }),
+  })
+);
+
+export type ProductSchema = z.infer<typeof productSchema>;
+
+export type ProductFormSchema = z.infer<typeof productFormSchema>;
