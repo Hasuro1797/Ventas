@@ -10,7 +10,7 @@ export default function HeaderComponent() {
   return (
     <header className="h-14 flex px-4 gap-4 items-center w-full">
       <SidebarTrigger />
-      <Separator orientation="vertical" className="h-4" />
+      <Separator orientation="vertical" className="!h-4" />
       <CustomBreadCrumb pathname={paths} />
     </header>
   );

@@ -28,3 +28,11 @@ interface UseTableProps {
   search: string;
   sort: string;
 }
+
+interface OrderItem {
+  productId: number
+  productName: string
+  price: number
+  quantity: number
+  subtotal: number
+}

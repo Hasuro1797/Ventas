@@ -144,3 +144,18 @@ export const productSchema = productFormSchema.merge(
 export type ProductSchema = z.infer<typeof productSchema>;
 
 export type ProductFormSchema = z.infer<typeof productFormSchema>;
+
+
+export const sendOrderSchema = object({
+  clientId: z.number().int().positive({ message: "El ID del cliente es obligatorio y debe ser un número positivo" }),
+  total: z.number().positive({ message: "El total es obligatorio y debe ser un número positivo" }),
+  items: z.array(
+    z.object({
+      productId: z.number().int().positive({ message: "El ID del producto es obligatorio y debe ser un número positivo" }),
+      quantity: z.number().int().positive({ message: "La cantidad es obligatoria y debe ser un número positivo" }),
+      subtotal: z.number().positive({ message: "El subtotal es obligatorio y debe ser un número positivo" }),
+    })
+  ),
+})
+
+export type SendOrderSchema = z.infer<typeof sendOrderSchema>;

@@ -1,7 +1,14 @@
 "use client";
-import { ChevronsUpDown, Loader, LogOut } from "lucide-react";
-import { useRouter } from "next/navigation";
-import { toast } from "sonner";
+import { signOut, useSession } from "next-auth/react";
+import { routes } from "@/lib/routes";
+import {
+  ChevronsUpDown,
+  Loader,
+  LogOut,
+  MonitorCog,
+  Moon,
+  Sun,
+} from "lucide-react";
 import { CustomAvatar } from "../customAvatar";
 import {
   DropdownMenu,
@@ -16,7 +23,9 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from "../ui/sidebar";
-import { routes } from "@/lib/routes";
+import { useTransition } from "react";
+import { Button } from "../ui/button";
+import { useTheme } from "next-themes";
 
 // interface UserApi {
 //   email: string;
@@ -30,24 +39,15 @@ import { routes } from "@/lib/routes";
 //   user: UserApi;
 // }
 export default function CustomSideBarFooter() {
-  const router = useRouter();
-
+  const { data: session } = useSession();
+  const [loading, startTransition] = useTransition();
+  const { setTheme } = useTheme();
   const handleSignOut = async () => {
-    try {
-      // await signOut();
-      router.push(routes.signin);
-    } catch (error) {
-      console.error(error);
-      toast.error("Error al cerrar sesión", {
-        description: "Por favor, inténtelo de nuevo",
-        classNames: {
-          toast: "bg-background",
-          icon: "text-red-500",
-          title: "text-foreground",
-          description: "text-foreground",
-        },
+    startTransition(() => {
+      signOut({
+        callbackUrl: routes.signin,
       });
-    }
+    });
   };
   return (
     <SidebarFooter>
@@ -59,16 +59,17 @@ export default function CustomSideBarFooter() {
                 size={"lg"}
                 className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground focus-visible:outline-none focus-visible:ring-0"
               >
-                {/* <CustomAvatar
-                  avatar={user?.avatar}
-                  name={user?.name}
-                  last_name={user?.last_name}
+                <CustomAvatar
                   styleAvatar="h-8 w-8 rounded-lg dark:text-foreground text-foreground"
                   styleFallback="rounded-lg dark:text-foreground text-foreground"
-                /> */}
+                />
                 <div className="grid flex-1 text-left dark:text-foreground text-foreground text-sm leading-tight">
-                  {/* <span className="truncate font-semibold">{user?.name}</span>
-                  <span className="truncate text-xs">{user?.email}</span> */}
+                  <span className="truncate font-semibold">
+                    {session?.user.name}
+                  </span>
+                  <span className="truncate text-xs">
+                    {session?.user.email}
+                  </span>
                 </div>
                 <ChevronsUpDown className="ml-auto size-4" />
               </SidebarMenuButton>
@@ -81,29 +82,53 @@ export default function CustomSideBarFooter() {
             >
               <DropdownMenuLabel className="p-0 font-normal">
                 <div className="flex items-center gap-2 px-1 py-1.5 text-left text-sm">
-                  {/* <CustomAvatar
-                    avatar={user?.avatar}
-                    name={user?.name}
-                    last_name={user?.last_name}
+                  <CustomAvatar
                     styleAvatar="h-8 w-8 rounded-lg dark:text-foreground text-foreground"
                     styleFallback="rounded-lg dark:text-foreground text-foreground"
-                  /> */}
+                  />
                   <div className="grid flex-1 text-left dark:text-foreground text-foreground text-sm leading-tight">
-                    {/* <span className="truncate font-semibold">{user?.name}</span>
-                    <span className="truncate text-xs">{user?.email}</span> */}
+                    <span className="truncate font-semibold">
+                      {session?.user.name}
+                    </span>
+                    <span className="truncate text-xs">
+                      {session?.user.email}
+                    </span>
                   </div>
                 </div>
               </DropdownMenuLabel>
               <DropdownMenuSeparator />
+              <DropdownMenuSeparator />
+              <DropdownMenuLabel className="p-0 font-normal">
+                <div className="flex items-center justify-end gap-2 px-1 py-1.5">
+                  <Button
+                    variant={"ghost"}
+                    size={"icon"}
+                    onClick={() => setTheme("system")}
+                  >
+                    <MonitorCog className="size-4 text-foreground" />
+                  </Button>
+                  <Button
+                    variant={"ghost"}
+                    size={"icon"}
+                    onClick={() => setTheme("light")}
+                  >
+                    <Sun className="size-4 text-foreground" />
+                  </Button>
+                  <Button
+                    variant={"ghost"}
+                    size={"icon"}
+                    className="!p-2"
+                    onClick={() => setTheme("dark")}
+                  >
+                    <Moon className="size-4 text-foreground" />
+                  </Button>
+                </div>
+              </DropdownMenuLabel>
               <DropdownMenuItem
                 onClick={handleSignOut}
-                className="text-wrong-foreground hover:!text-wrong-foreground"
+                className="text-wrong-foreground hover:!text-red-600"
               >
-                {/* {signOutLoading ? (
-                  <Loader className="animate-spin repeat-infinite" />
-                ) : (
-                  <LogOut />
-                )} */}
+                {loading ? <Loader /> : <LogOut />}
                 Cerrar sesión
               </DropdownMenuItem>
             </DropdownMenuContent>
