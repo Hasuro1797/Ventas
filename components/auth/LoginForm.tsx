@@ -54,7 +54,7 @@ export function LoginForm({
       if (response?.error) {
         setError(response.error);
       } else {
-        router.push(typeof redirect === "string" ? redirect : routes.home);
+        router.push(typeof redirect === "string" ? redirect : routes.clients);
       }
     });
   }
