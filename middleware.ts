@@ -4,8 +4,12 @@ import { getToken } from "next-auth/jwt";
 
 export async function middleware(req: NextRequest){
   const {nextUrl} = req;
-  const isLoggedIn = await getToken({req, secret: process.env.AUTH_SECRET});
-
+  const isLoggedIn = await getToken({
+    req, 
+    secret: process.env.AUTH_SECRET, 
+    cookieName: process.env.NODE_ENV === "production" ? '__Secure-authjs.session-token': 'authjs.session-token'
+  });
+  console.log("el log", isLoggedIn);
   if (nextUrl.pathname === routes.home) {
     return NextResponse.redirect(new URL(routes.signin, req.nextUrl));
   }
