@@ -4,13 +4,15 @@ import { authGuard } from "@/lib/auth/authGuard";
 import { NextRequest } from "next/server";
 import ClientInfo from "@/models/clientInfo";
 
-export async function GET(request: NextRequest, context: {params: { id: string }}) {
+export async function GET(request: NextRequest, { params }: { params: Promise<{id: string }>}) {
   const token = await authGuard(request);
   if (token instanceof Response) {
     return token;
   }
   try {
-    const { id } = await context.params;
+    const { id } = await params;
+    console.log("el contextparams es", id);
+    console.log("el id es: ", id);
     await connectToMongoose();
     const client = await prisma.client.findUnique({
       where: {

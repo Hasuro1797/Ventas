@@ -2,13 +2,13 @@ import { prisma } from "@/db/prisma";
 import { authGuard } from "@/lib/auth/authGuard";
 import { NextRequest } from "next/server";
 
-export async function GET(request: NextRequest, context: {params: { id: string }}) {
+export async function GET(request: NextRequest, { params }: {params: Promise<{ id: string }>}) {
   const token = await authGuard(request);
   if (token instanceof Response) {
     return token;
   }
   try {
-    const { id } = await context.params;
+    const { id } = await params;
     const product = await prisma.product.findUnique({
       where: {
         id: +id,
